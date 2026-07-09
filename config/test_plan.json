@@ -1,0 +1,17 @@
+{
+  "product_context": "Cloud-connected embedded home-energy station simulator for EV/PV/BESS workflows",
+  "risk_areas": [
+    "device protocol framing and CRC integrity",
+    "safety interlocks for bidirectional energy modes",
+    "device-to-cloud telemetry continuity",
+    "OTA/update status determinism",
+    "field-log driven regression coverage"
+  ],
+  "requirements": [
+    {"id": "REQ-PROT-001", "description": "Reject corrupted device frames deterministically", "tests": ["tests/test_protocol_frame.py::test_frame_rejects_corrupted_crc"]},
+    {"id": "REQ-HIL-001", "description": "Expose measurable device telemetry through reusable client APIs", "tests": ["tests/test_device_workflows.py::test_device_ping_and_measurements_are_observable"]},
+    {"id": "REQ-SAFE-001", "description": "Block V2H/V2G mode when battery SOC is below threshold", "tests": ["tests/test_device_workflows.py::test_v2h_mode_is_blocked_when_soc_is_too_low"]},
+    {"id": "REQ-CLOUD-001", "description": "Publish JSON-serializable cloud telemetry with status and power metrics", "tests": ["tests/test_device_workflows.py::test_device_to_cloud_telemetry_round_trip"]},
+    {"id": "REQ-REG-001", "description": "Map field failures to regression families", "tests": ["tests/test_regression_field_log.py::test_field_logs_are_mapped_to_regression_families"]}
+  ]
+}

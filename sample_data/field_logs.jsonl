@@ -1,0 +1,3 @@
+{"case_id":"FLD-001","severity":"major","subsystem":"cloud","code":"cloud_heartbeat_gap","message":"Device stopped publishing health heartbeat after Wi-Fi reconnection.","expected_regression":"REG-CLOUD-HEARTBEAT"}
+{"case_id":"FLD-002","severity":"critical","subsystem":"power_path","code":"dc_link_undervoltage_recovery","message":"DC link recovery path must not enable V2H until safety preconditions are true.","expected_regression":"REG-SAFETY-V2H-SOC"}
+{"case_id":"FLD-003","severity":"major","subsystem":"ota","code":"ota_resume_after_power_cycle","message":"OTA resume state must remain deterministic after power-cycle during download stage.","expected_regression":"REG-OTA-RESUME"}
