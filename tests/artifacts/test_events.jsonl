@@ -1,0 +1,4 @@
+{"nodeid": "tests/test_memory_diagnostics.py::test_ram_quick_check_passes", "outcome": "passed", "duration_s": 0.000834, "markers": ["release_gate"]}
+{"nodeid": "tests/test_memory_diagnostics.py::test_nvm_crc_mismatch_blocks_release", "outcome": "passed", "duration_s": 0.000713, "markers": ["release_gate"]}
+{"nodeid": "tests/test_memory_diagnostics.py::test_eeprom_scratch_write_readback", "outcome": "passed", "duration_s": 0.002226, "markers": ["release_gate"]}
+{"nodeid": "tests/test_memory_diagnostics.py::test_factory_region_is_read_only", "outcome": "passed", "duration_s": 0.000719, "markers": ["release_gate"]}

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "embedded-quality-validation-showcase"
-version = "0.2.0"
+version = "0.3.0"
 description = "Python validation framework showcase for cloud-connected embedded home-energy devices."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -31,6 +31,7 @@ markers = [
   "regression: tests created from field telemetry/failure logs",
   "cloud: device-to-cloud interaction tests",
   "release_gate: tests that block release decisions",
+  "memory: RAM/NVM/EEPROM diagnostic validation tests",
 ]
 
 [tool.setuptools.packages.find]

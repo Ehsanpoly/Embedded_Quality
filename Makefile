@@ -61,3 +61,19 @@ clean:
 	rm -rf .pytest_cache .ruff_cache .mypy_cache htmlcov dist build *.egg-info src/*.egg-info
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 	rm -f artifacts/*.json artifacts/*.jsonl artifacts/*.xml artifacts/*.md .coverage
+
+.PHONY: memory-sanity
+memory-sanity:
+	$(PYTHON) main.py memory-sanity --target sim
+
+.PHONY: nvm-check
+nvm-check:
+	$(PYTHON) main.py nvm-check --target sim
+
+.PHONY: fast-gate
+fast-gate:
+	$(PYTHON) main.py fast-gate
+
+.PHONY: endurance-plan
+endurance-plan:
+	$(PYTHON) main.py endurance-plan

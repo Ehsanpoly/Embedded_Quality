@@ -1,0 +1,461 @@
+{
+  "artifact_manifest": {
+    "contains": [
+      "runtime_metadata",
+      "bench_metadata",
+      "named_check_results",
+      "memory_diagnostic_reports",
+      "device_tx_rx_trace",
+      "cloud_records",
+      "fast_state_snapshot",
+      "quality_gate_decision"
+    ],
+    "local_validation_report": "artifacts/local_validation_report.json"
+  },
+  "bench": {
+    "bench_type": "deterministic_simulated_hil",
+    "device_id": "ARA-SIM-0001",
+    "firmware_version": "sim-fw-0.1.0",
+    "os_image": "sim-linux-qa",
+    "replaceable_by": [
+      "SerialTransport",
+      "CAN adapter",
+      "Modbus adapter",
+      "Ethernet adapter"
+    ],
+    "transport": "FakeHilTransport"
+  },
+  "checks": [
+    {
+      "critical": true,
+      "details": {
+        "pong": true
+      },
+      "error": null,
+      "name": "device_ping",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "battery_soc_percent": 83.0,
+        "ev_power_kw": 7.4,
+        "grid_power_kw": -1.1,
+        "pv_power_kw": 4.2
+      },
+      "error": null,
+      "name": "power_measurements",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "ack_mode": "EV_CHARGE"
+      },
+      "error": null,
+      "name": "ev_charge_mode",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "blocked": true,
+        "reason": "safety interlock rejected mode V2H_BACKUP: soc_below_threshold",
+        "soc_percent": 15.0
+      },
+      "error": null,
+      "name": "v2h_low_soc_safety_interlock",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "details": {
+          "algorithm": "reserved-region walking-1/walking-0",
+          "destructive": false,
+          "region": "diagnostic_reserved_ram",
+          "tested_bytes": 4096
+        },
+        "duration_ms": 38.5,
+        "severity": "release_blocker",
+        "status": "PASS",
+        "test_name": "ram_quick_check"
+      },
+      "error": null,
+      "name": "ram_quick_check",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "cache_decision": {
+          "changed_keys": {
+            "memory.nvm.crc": {
+              "after": "0x91AF",
+              "before": null
+            },
+            "memory.nvm.schema_version": {
+              "after": 3,
+              "before": null
+            }
+          },
+          "expensive_scan_needed": true
+        },
+        "details": {
+          "actual_crc": "0x91AF",
+          "expected_crc": "0x91AF",
+          "region": "configuration_nvm",
+          "schema_version": 3
+        },
+        "duration_ms": 12.2,
+        "severity": "release_blocker",
+        "status": "PASS",
+        "test_name": "nvm_crc_integrity"
+      },
+      "error": null,
+      "name": "nvm_crc_integrity",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "details": {
+          "key": "bench_counter",
+          "readback": 1,
+          "region": "reserved_scratch_page",
+          "write_count_increment": 1,
+          "written": 1
+        },
+        "duration_ms": 18.6,
+        "severity": "release_blocker",
+        "status": "PASS",
+        "test_name": "nvm_scratch_write_readback"
+      },
+      "error": null,
+      "name": "nvm_scratch_write_readback",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "details": {
+          "actual_schema_version": 3,
+          "expected_schema_version": 3,
+          "migration_required": false
+        },
+        "duration_ms": 9.4,
+        "severity": "release_blocker",
+        "status": "PASS",
+        "test_name": "nvm_schema_validate"
+      },
+      "error": null,
+      "name": "nvm_schema_validate",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "details": {
+          "attempted_write_blocked": true,
+          "factory_region_locked": true,
+          "region": "factory_identity_and_calibration"
+        },
+        "duration_ms": 5.1,
+        "severity": "release_blocker",
+        "status": "PASS",
+        "test_name": "nvm_factory_region_locked"
+      },
+      "error": null,
+      "name": "nvm_factory_region_locked",
+      "passed": true
+    },
+    {
+      "critical": false,
+      "details": {
+        "details": {
+          "endurance_policy": "nightly/endurance-only, not PR smoke",
+          "erase_write_cycles": 128,
+          "warning_threshold": 80000
+        },
+        "duration_ms": 4.0,
+        "severity": "warning",
+        "status": "PASS",
+        "test_name": "nvm_wear_level_stats"
+      },
+      "error": null,
+      "name": "nvm_wear_level_stats",
+      "passed": true
+    },
+    {
+      "critical": false,
+      "details": {
+        "current_crc": "0x91AF",
+        "diff": {
+          "validation.cache.full_nvm_scan_skipped": {
+            "after": true,
+            "before": null
+          }
+        },
+        "reason": "CRC unchanged in host fast-state cache",
+        "should_skip_full_nvm_scan": true
+      },
+      "error": null,
+      "name": "fast_state_store_cached_nvm_crc",
+      "passed": true
+    },
+    {
+      "critical": true,
+      "details": {
+        "cloud_ack": {
+          "accepted": true,
+          "message_index": 0
+        },
+        "payload": {
+          "battery_soc_percent": 83.0,
+          "cloud_status": "CONNECTED",
+          "nvm_crc": "0x91AF",
+          "ota_status": "IDLE",
+          "pv_power_kw": 4.2
+        }
+      },
+      "error": null,
+      "name": "device_to_cloud_telemetry",
+      "passed": true
+    }
+  ],
+  "cloud_records": [
+    {
+      "device_id": "ARA-SIM-0001",
+      "payload": {
+        "battery_soc_percent": 83.0,
+        "cloud_status": "CONNECTED",
+        "nvm_crc": "0x91AF",
+        "ota_status": "IDLE",
+        "pv_power_kw": 4.2
+      },
+      "timestamp_s": 1783864339
+    }
+  ],
+  "device_trace": [
+    {
+      "duration_ms": 0.034,
+      "request_payload_hex": "",
+      "response_payload_hex": "504f4e47",
+      "service": 1,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.044,
+      "request_payload_hex": "01",
+      "response_payload_hex": "66668640",
+      "service": 16,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.019,
+      "request_payload_hex": "02",
+      "response_payload_hex": "cdccec40",
+      "service": 16,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.016,
+      "request_payload_hex": "03",
+      "response_payload_hex": "cdcc8cbf",
+      "service": 16,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.035,
+      "request_payload_hex": "04",
+      "response_payload_hex": "0000a642",
+      "service": 16,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.026,
+      "request_payload_hex": "02",
+      "response_payload_hex": "45565f434841524745",
+      "service": 32,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.047,
+      "request_payload_hex": "03",
+      "response_payload_hex": "736f635f62656c6f775f7468726573686f6c64",
+      "service": 32,
+      "status": 2
+    },
+    {
+      "duration_ms": 0.31,
+      "request_payload_hex": "",
+      "response_payload_hex": "7b2264657461696c73223a207b22616c676f726974686d223a202272657365727665642d726567696f6e2077616c6b696e672d312f77616c6b696e672d30222c20226465737472756374697665223a2066616c73652c2022726567696f6e223a2022646961676e6f737469635f72657365727665645f72616d222c20227465737465645f6279746573223a20343039367d2c20226475726174696f6e5f6d73223a2033382e352c20227365766572697479223a202272656c656173655f626c6f636b6572222c2022737461747573223a202250415353222c2022746573745f6e616d65223a202272616d5f717569636b5f636865636b227d",
+      "service": 80,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.245,
+      "request_payload_hex": "",
+      "response_payload_hex": "7b2264657461696c73223a207b2261637475616c5f637263223a2022307839314146222c202265787065637465645f637263223a2022307839314146222c2022726567696f6e223a2022636f6e66696775726174696f6e5f6e766d222c2022736368656d615f76657273696f6e223a20337d2c20226475726174696f6e5f6d73223a2031322e322c20227365766572697479223a202272656c656173655f626c6f636b6572222c2022737461747573223a202250415353222c2022746573745f6e616d65223a20226e766d5f6372635f696e74656772697479227d",
+      "service": 81,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.305,
+      "request_payload_hex": "7b226b6579223a202262656e63685f636f756e746572222c202276616c7565223a20317d",
+      "response_payload_hex": "7b2264657461696c73223a207b226b6579223a202262656e63685f636f756e746572222c2022726561646261636b223a20312c2022726567696f6e223a202272657365727665645f736372617463685f70616765222c202277726974655f636f756e745f696e6372656d656e74223a20312c20227772697474656e223a20317d2c20226475726174696f6e5f6d73223a2031382e362c20227365766572697479223a202272656c656173655f626c6f636b6572222c2022737461747573223a202250415353222c2022746573745f6e616d65223a20226e766d5f736372617463685f77726974655f726561646261636b227d",
+      "service": 82,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.227,
+      "request_payload_hex": "",
+      "response_payload_hex": "7b2264657461696c73223a207b2261637475616c5f736368656d615f76657273696f6e223a20332c202265787065637465645f736368656d615f76657273696f6e223a20332c20226d6967726174696f6e5f7265717569726564223a2066616c73657d2c20226475726174696f6e5f6d73223a20392e342c20227365766572697479223a202272656c656173655f626c6f636b6572222c2022737461747573223a202250415353222c2022746573745f6e616d65223a20226e766d5f736368656d615f76616c6964617465227d",
+      "service": 83,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.248,
+      "request_payload_hex": "",
+      "response_payload_hex": "7b2264657461696c73223a207b22617474656d707465645f77726974655f626c6f636b6564223a20747275652c2022666163746f72795f726567696f6e5f6c6f636b6564223a20747275652c2022726567696f6e223a2022666163746f72795f6964656e746974795f616e645f63616c6962726174696f6e227d2c20226475726174696f6e5f6d73223a20352e312c20227365766572697479223a202272656c656173655f626c6f636b6572222c2022737461747573223a202250415353222c2022746573745f6e616d65223a20226e766d5f666163746f72795f726567696f6e5f6c6f636b6564227d",
+      "service": 84,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.243,
+      "request_payload_hex": "",
+      "response_payload_hex": "7b2264657461696c73223a207b22656e647572616e63655f706f6c696379223a20226e696768746c792f656e647572616e63652d6f6e6c792c206e6f7420505220736d6f6b65222c202265726173655f77726974655f6379636c6573223a203132382c20227761726e696e675f7468726573686f6c64223a2038303030307d2c20226475726174696f6e5f6d73223a20342e302c20227365766572697479223a20227761726e696e67222c2022737461747573223a202250415353222c2022746573745f6e616d65223a20226e766d5f776561725f6c6576656c5f7374617473227d",
+      "service": 85,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.021,
+      "request_payload_hex": "",
+      "response_payload_hex": "434f4e4e4543544544",
+      "service": 48,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.015,
+      "request_payload_hex": "",
+      "response_payload_hex": "49444c45",
+      "service": 64,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.016,
+      "request_payload_hex": "01",
+      "response_payload_hex": "66668640",
+      "service": 16,
+      "status": 0
+    },
+    {
+      "duration_ms": 0.015,
+      "request_payload_hex": "04",
+      "response_payload_hex": "0000a642",
+      "service": 16,
+      "status": 0
+    }
+  ],
+  "fast_state_snapshot": {
+    "bench.device_id": "ARA-SIM-0001",
+    "bench.firmware_version": "sim-fw-0.1.0",
+    "bench.transport": "FakeHilTransport",
+    "cloud.heartbeat": "CONNECTED",
+    "memory.nvm.crc": "0x91AF",
+    "memory.nvm.erase_write_cycles": 128,
+    "memory.nvm.factory_region_locked": true,
+    "memory.nvm.schema_status": "PASS",
+    "memory.nvm.schema_version": 3,
+    "memory.nvm.scratch_last_status": "PASS",
+    "memory.ram.status": "PASS",
+    "memory.ram.tested_bytes": 4096,
+    "telemetry.latest.battery_soc_percent": 83.0,
+    "telemetry.latest.ev_power_kw": 7.4,
+    "telemetry.latest.grid_power_kw": -1.1,
+    "telemetry.latest.pv_power_kw": 4.2,
+    "validation.cache.full_nvm_scan_skipped": true
+  },
+  "memory_reports": [
+    {
+      "details": {
+        "algorithm": "reserved-region walking-1/walking-0",
+        "destructive": false,
+        "region": "diagnostic_reserved_ram",
+        "tested_bytes": 4096
+      },
+      "duration_ms": 38.5,
+      "severity": "release_blocker",
+      "status": "PASS",
+      "test_name": "ram_quick_check"
+    },
+    {
+      "details": {
+        "actual_crc": "0x91AF",
+        "expected_crc": "0x91AF",
+        "region": "configuration_nvm",
+        "schema_version": 3
+      },
+      "duration_ms": 12.2,
+      "severity": "release_blocker",
+      "status": "PASS",
+      "test_name": "nvm_crc_integrity"
+    },
+    {
+      "details": {
+        "key": "bench_counter",
+        "readback": 1,
+        "region": "reserved_scratch_page",
+        "write_count_increment": 1,
+        "written": 1
+      },
+      "duration_ms": 18.6,
+      "severity": "release_blocker",
+      "status": "PASS",
+      "test_name": "nvm_scratch_write_readback"
+    },
+    {
+      "details": {
+        "actual_schema_version": 3,
+        "expected_schema_version": 3,
+        "migration_required": false
+      },
+      "duration_ms": 9.4,
+      "severity": "release_blocker",
+      "status": "PASS",
+      "test_name": "nvm_schema_validate"
+    },
+    {
+      "details": {
+        "attempted_write_blocked": true,
+        "factory_region_locked": true,
+        "region": "factory_identity_and_calibration"
+      },
+      "duration_ms": 5.1,
+      "severity": "release_blocker",
+      "status": "PASS",
+      "test_name": "nvm_factory_region_locked"
+    },
+    {
+      "details": {
+        "endurance_policy": "nightly/endurance-only, not PR smoke",
+        "erase_write_cycles": 128,
+        "warning_threshold": 80000
+      },
+      "duration_ms": 4.0,
+      "severity": "warning",
+      "status": "PASS",
+      "test_name": "nvm_wear_level_stats"
+    }
+  ],
+  "metadata": {
+    "generated_at_utc": "2026-07-12T13:52:19+00:00",
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.11"
+  },
+  "quality_gate": {
+    "passed": true,
+    "reasons": []
+  }
+}

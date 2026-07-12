@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import struct
 import time
@@ -18,6 +19,12 @@ class Service:
     SET_MODE = 0x20
     CLOUD_STATUS = 0x30
     OTA_STATUS = 0x40
+    RAM_QUICK_CHECK = 0x50
+    NVM_CRC_CHECK = 0x51
+    NVM_SCRATCH_WRITE_READBACK = 0x52
+    NVM_SCHEMA_VALIDATE = 0x53
+    NVM_FACTORY_REGION_LOCKED = 0x54
+    NVM_WEAR_LEVEL_STATS = 0x55
     FAULT_INJECTION = 0xF0
 
 
@@ -52,6 +59,13 @@ class FakeHilTransport(Transport):
     active_mode: str = "SELF_CONSUMPTION"
     injected_faults: set[str] = field(default_factory=set)
     trace: list[dict[str, Any]] = field(default_factory=list)
+    ram_tested_bytes: int = 4096
+    nvm_crc: str = "0x91AF"
+    nvm_schema_version: int = 3
+    expected_nvm_schema_version: int = 3
+    factory_region_locked: bool = True
+    nvm_wear_cycles: int = 128
+    nvm_scratch: dict[str, Any] = field(default_factory=dict)
 
     measurement_ids = {
         1: "pv_power_kw",
@@ -85,6 +99,27 @@ class FakeHilTransport(Transport):
         log.debug("simulated exchange service=0x%02X status=0x%02X", req.service, status)
         return response
 
+
+    @staticmethod
+    def _json_report(
+        *,
+        test_name: str,
+        status: str = "PASS",
+        severity: str = "info",
+        duration_ms: float = 0.0,
+        details: dict[str, Any] | None = None,
+    ) -> bytes:
+        return json.dumps(
+            {
+                "test_name": test_name,
+                "status": status,
+                "severity": severity,
+                "duration_ms": duration_ms,
+                "details": details or {},
+            },
+            sort_keys=True,
+        ).encode("utf-8")
+
     def _handle(self, req: Frame) -> tuple[int, bytes]:
         if req.service == Service.PING:
             return Status.OK, b"PONG"
@@ -115,6 +150,114 @@ class FakeHilTransport(Transport):
 
         if req.service == Service.OTA_STATUS:
             return Status.OK, self.ota_state.encode("ascii")
+
+        if req.service == Service.RAM_QUICK_CHECK:
+            if "ram_data_fault" in self.injected_faults:
+                return Status.OK, self._json_report(
+                    test_name="ram_quick_check",
+                    status="FAIL",
+                    severity="release_blocker",
+                    duration_ms=41.8,
+                    details={
+                        "tested_bytes": self.ram_tested_bytes,
+                        "algorithm": "reserved-region walking-1/walking-0",
+                        "error_address": "0x20001040",
+                        "expected": "0xA5A5A5A5",
+                        "actual": "0xA5A5A5A4",
+                    },
+                )
+            return Status.OK, self._json_report(
+                test_name="ram_quick_check",
+                status="PASS",
+                severity="release_blocker",
+                duration_ms=38.5,
+                details={
+                    "tested_bytes": self.ram_tested_bytes,
+                    "algorithm": "reserved-region walking-1/walking-0",
+                    "destructive": False,
+                    "region": "diagnostic_reserved_ram",
+                },
+            )
+
+        if req.service == Service.NVM_CRC_CHECK:
+            crc_ok = "nvm_crc_mismatch" not in self.injected_faults
+            return Status.OK, self._json_report(
+                test_name="nvm_crc_integrity",
+                status="PASS" if crc_ok else "FAIL",
+                severity="release_blocker",
+                duration_ms=12.2,
+                details={
+                    "expected_crc": self.nvm_crc,
+                    "actual_crc": self.nvm_crc if crc_ok else "0xDEAD",
+                    "region": "configuration_nvm",
+                    "schema_version": self.nvm_schema_version,
+                },
+            )
+
+        if req.service == Service.NVM_SCRATCH_WRITE_READBACK:
+            try:
+                payload = json.loads(req.payload.decode("utf-8"))
+                key = str(payload["key"])
+                value = payload["value"]
+            except Exception:
+                return Status.BAD_REQUEST, b""
+            self.nvm_scratch[key] = value
+            readback = self.nvm_scratch.get(key)
+            passed = readback == value and "nvm_scratch_stuck_bit" not in self.injected_faults
+            return Status.OK, self._json_report(
+                test_name="nvm_scratch_write_readback",
+                status="PASS" if passed else "FAIL",
+                severity="release_blocker",
+                duration_ms=18.6,
+                details={
+                    "key": key,
+                    "written": value,
+                    "readback": readback if passed else "corrupted",
+                    "region": "reserved_scratch_page",
+                    "write_count_increment": 1,
+                },
+            )
+
+        if req.service == Service.NVM_SCHEMA_VALIDATE:
+            passed = self.nvm_schema_version == self.expected_nvm_schema_version
+            return Status.OK, self._json_report(
+                test_name="nvm_schema_validate",
+                status="PASS" if passed else "FAIL",
+                severity="release_blocker",
+                duration_ms=9.4,
+                details={
+                    "expected_schema_version": self.expected_nvm_schema_version,
+                    "actual_schema_version": self.nvm_schema_version,
+                    "migration_required": not passed,
+                },
+            )
+
+        if req.service == Service.NVM_FACTORY_REGION_LOCKED:
+            return Status.OK, self._json_report(
+                test_name="nvm_factory_region_locked",
+                status="PASS" if self.factory_region_locked else "FAIL",
+                severity="release_blocker",
+                duration_ms=5.1,
+                details={
+                    "factory_region_locked": self.factory_region_locked,
+                    "attempted_write_blocked": self.factory_region_locked,
+                    "region": "factory_identity_and_calibration",
+                },
+            )
+
+        if req.service == Service.NVM_WEAR_LEVEL_STATS:
+            warn_threshold = 80000
+            return Status.OK, self._json_report(
+                test_name="nvm_wear_level_stats",
+                status="PASS" if self.nvm_wear_cycles < warn_threshold else "WARN",
+                severity="warning",
+                duration_ms=4.0,
+                details={
+                    "erase_write_cycles": self.nvm_wear_cycles,
+                    "warning_threshold": warn_threshold,
+                    "endurance_policy": "nightly/endurance-only, not PR smoke",
+                },
+            )
 
         if req.service == Service.FAULT_INJECTION:
             fault = req.payload.decode("ascii", errors="replace")

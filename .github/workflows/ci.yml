@@ -27,7 +27,13 @@ jobs:
       - name: Formatting and lint gate
         run: ruff check .
       - name: Smoke validation runner
-        run: python main.py smoke --output artifacts/smoke_report.json
+        run: python main.py smoke --output artifacts/local_validation_report.json
+      - name: Memory sanity artifact
+        run: python main.py memory-sanity --target sim
+      - name: NVM check artifact
+        run: python main.py nvm-check --target sim
+      - name: Fast-state gate artifact
+        run: python main.py fast-gate
       - name: Pytest validation suite
         run: pytest --cov=eqv --cov-report=xml --cov-report=term-missing
       - name: Release quality gate
