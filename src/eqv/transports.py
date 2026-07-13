@@ -8,7 +8,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
 
-from .protocols.frame import Frame, decode_frame, encode_frame
+from .exceptions import ErrorContext, TransportError
+from .protocols.frame import Frame, ProtocolError, decode_frame, encode_frame
 
 log = logging.getLogger(__name__)
 
@@ -35,10 +36,30 @@ class Status:
     UNKNOWN_SERVICE = 0xFE
 
 
+SERVICE_NAMES = {
+    Service.PING: "PING",
+    Service.READ_MEASUREMENT: "READ_MEASUREMENT",
+    Service.SET_MODE: "SET_MODE",
+    Service.CLOUD_STATUS: "CLOUD_STATUS",
+    Service.OTA_STATUS: "OTA_STATUS",
+    Service.RAM_QUICK_CHECK: "RAM_QUICK_CHECK",
+    Service.NVM_CRC_CHECK: "NVM_CRC_CHECK",
+    Service.NVM_SCRATCH_WRITE_READBACK: "NVM_SCRATCH_WRITE_READBACK",
+    Service.NVM_SCHEMA_VALIDATE: "NVM_SCHEMA_VALIDATE",
+    Service.NVM_FACTORY_REGION_LOCKED: "NVM_FACTORY_REGION_LOCKED",
+    Service.NVM_WEAR_LEVEL_STATS: "NVM_WEAR_LEVEL_STATS",
+    Service.FAULT_INJECTION: "FAULT_INJECTION",
+}
+
+
 class Transport(ABC):
     @abstractmethod
     def exchange(self, request: bytes, timeout_s: float = 1.0) -> bytes:
         """Send one request and return one response."""
+
+
+def service_name(service: int) -> str:
+    return SERVICE_NAMES.get(service, f"0x{service:02X}")
 
 
 @dataclass
@@ -47,7 +68,8 @@ class FakeHilTransport(Transport):
 
     The simulator deliberately behaves like a small embedded target: requests are
     framed, status bytes are returned, telemetry is mutable, and injected faults
-    can be used to reproduce field failures.
+    can be used to reproduce field failures. It is deterministic so CI failures
+    are meaningful instead of random.
     """
 
     pv_power_kw: float = 4.2
@@ -83,22 +105,32 @@ class FakeHilTransport(Transport):
     }
 
     def exchange(self, request: bytes, timeout_s: float = 1.0) -> bytes:
+        if timeout_s <= 0:
+            raise TransportError("timeout_s must be positive", context=ErrorContext(operation="sim_exchange"))
         start = time.perf_counter()
-        req = decode_frame(request)
-        status, payload = self._handle(req)
-        response = encode_frame(req.service, bytes([status]) + payload)
-        self.trace.append(
-            {
+        try:
+            req = decode_frame(request)
+            status, payload = self._handle(req)
+            response = encode_frame(req.service, bytes([status]) + payload)
+            duration_ms = round((time.perf_counter() - start) * 1000, 3)
+            trace_item = {
+                "transport": type(self).__name__,
                 "service": req.service,
+                "service_name": service_name(req.service),
                 "request_payload_hex": req.payload.hex(),
                 "status": status,
                 "response_payload_hex": payload.hex(),
-                "duration_ms": round((time.perf_counter() - start) * 1000, 3),
+                "duration_ms": duration_ms,
             }
-        )
-        log.debug("simulated exchange service=0x%02X status=0x%02X", req.service, status)
-        return response
-
+            self.trace.append(trace_item)
+            log.debug("sim txrx service=%s status=0x%02X duration_ms=%.3f", service_name(req.service), status, duration_ms)
+            return response
+        except ProtocolError as exc:
+            log.exception("sim protocol decode failed request_hex=%s", request.hex())
+            raise TransportError(
+                "simulator received malformed request frame",
+                context=ErrorContext(operation="sim_decode", details={"request_hex": request.hex()}),
+            ) from exc
 
     @staticmethod
     def _json_report(
@@ -126,19 +158,19 @@ class FakeHilTransport(Transport):
 
         if req.service == Service.READ_MEASUREMENT:
             if len(req.payload) != 1:
-                return Status.BAD_REQUEST, b""
+                return Status.BAD_REQUEST, b"measurement request expects one-byte measurement id"
             name = self.measurement_ids.get(req.payload[0])
             if not name:
-                return Status.BAD_REQUEST, b""
+                return Status.BAD_REQUEST, b"unknown measurement id"
             value = getattr(self, name)
             return Status.OK, struct.pack("<f", float(value))
 
         if req.service == Service.SET_MODE:
             if len(req.payload) != 1:
-                return Status.BAD_REQUEST, b""
+                return Status.BAD_REQUEST, b"set-mode request expects one-byte mode id"
             mode = self.mode_codes.get(req.payload[0])
             if not mode:
-                return Status.BAD_REQUEST, b""
+                return Status.BAD_REQUEST, b"unknown mode id"
             if mode.startswith("V2") and self.battery_soc_percent < 20:
                 return Status.SAFETY_BLOCKED, b"soc_below_threshold"
             self.active_mode = mode
@@ -199,8 +231,8 @@ class FakeHilTransport(Transport):
                 payload = json.loads(req.payload.decode("utf-8"))
                 key = str(payload["key"])
                 value = payload["value"]
-            except Exception:
-                return Status.BAD_REQUEST, b""
+            except (UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError):
+                return Status.BAD_REQUEST, b"bad scratch write/readback payload"
             self.nvm_scratch[key] = value
             readback = self.nvm_scratch.get(key)
             passed = readback == value and "nvm_scratch_stuck_bit" not in self.injected_faults
@@ -264,41 +296,65 @@ class FakeHilTransport(Transport):
             self.injected_faults.add(fault)
             return Status.OK, fault.encode("ascii")
 
-        return Status.UNKNOWN_SERVICE, b""
+        return Status.UNKNOWN_SERVICE, b"unknown service"
 
 
 @dataclass
 class SerialTransport(Transport):
-    """Real-hardware adapter placeholder for USB-C UART / RS-232 / RS-485 benches.
-
-    The class is intentionally optional: the showcase runs without pyserial, while
-    the boundary shows exactly where a production bench would plug in physical
-    hardware. Tests can keep using HomeEnergyStationClient unchanged.
-    """
+    """Real-hardware adapter placeholder for USB-C UART / RS-232 / RS-485 benches."""
 
     port: str
     baudrate: int = 115200
     write_timeout_s: float = 1.0
+    trace: list[dict[str, Any]] = field(default_factory=list)
 
     def exchange(self, request: bytes, timeout_s: float = 1.0) -> bytes:
+        if timeout_s <= 0:
+            raise TransportError("timeout_s must be positive", context=ErrorContext(operation="serial_exchange"))
         try:
             import serial  # type: ignore[import-not-found]
         except ModuleNotFoundError as exc:  # pragma: no cover - pyserial is optional in the showcase
-            raise RuntimeError("SerialTransport requires pyserial: python -m pip install pyserial") from exc
+            raise TransportError(
+                "SerialTransport requires pyserial: python -m pip install pyserial",
+                context=ErrorContext(operation="serial_import", target=self.port),
+            ) from exc
 
-        with serial.Serial(
-            self.port,
-            self.baudrate,
-            timeout=timeout_s,
-            write_timeout=self.write_timeout_s,
-        ) as ser:
-            ser.write(request)
-            ser.flush()
-            header = ser.read(2)
-            if len(header) != 2:
-                raise TimeoutError(f"serial timeout waiting for frame header on {self.port}")
-            length = header[1]
-            rest = ser.read(length + 2)
-            if len(rest) != length + 2:
-                raise TimeoutError(f"serial timeout waiting for {length + 2} frame bytes on {self.port}")
-            return header + rest
+        start = time.perf_counter()
+        try:  # pragma: no cover - exercised only with physical serial hardware
+            with serial.Serial(
+                self.port,
+                self.baudrate,
+                timeout=timeout_s,
+                write_timeout=self.write_timeout_s,
+            ) as ser:
+                ser.write(request)
+                ser.flush()
+                header = ser.read(2)
+                if len(header) != 2:
+                    raise TimeoutError(f"serial timeout waiting for frame header on {self.port}")
+                length = header[1]
+                rest = ser.read(length + 2)
+                if len(rest) != length + 2:
+                    raise TimeoutError(f"serial timeout waiting for {length + 2} frame bytes on {self.port}")
+                response = header + rest
+                self.trace.append(
+                    {
+                        "transport": type(self).__name__,
+                        "port": self.port,
+                        "baudrate": self.baudrate,
+                        "request_hex": request.hex(),
+                        "response_hex": response.hex(),
+                        "duration_ms": round((time.perf_counter() - start) * 1000, 3),
+                    }
+                )
+                return response
+        except (OSError, TimeoutError, serial.SerialException) as exc:  # type: ignore[attr-defined]  # pragma: no cover
+            log.exception("serial exchange failed port=%s baudrate=%s", self.port, self.baudrate)
+            raise TransportError(
+                f"serial exchange failed on {self.port}",
+                context=ErrorContext(
+                    operation="serial_exchange",
+                    target=self.port,
+                    details={"baudrate": self.baudrate, "request_hex": request.hex()},
+                ),
+            ) from exc

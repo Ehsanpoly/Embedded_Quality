@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "embedded-quality-validation-showcase"
-version = "0.3.0"
+version = "0.4.0"
 description = "Python validation framework showcase for cloud-connected embedded home-energy devices."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -18,6 +18,7 @@ dev = [
   "ruff>=0.8",
 ]
 serial = ["pyserial>=3.5"]
+package = ["pyinstaller>=6"]
 
 [project.scripts]
 eqv = "eqv.cli:main"
@@ -32,6 +33,7 @@ markers = [
   "cloud: device-to-cloud interaction tests",
   "release_gate: tests that block release decisions",
   "memory: RAM/NVM/EEPROM diagnostic validation tests",
+  "fixture_patterns: advanced pytest fixture mechanics showcase",
 ]
 
 [tool.setuptools.packages.find]

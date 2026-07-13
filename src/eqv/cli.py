@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Sequence
 
 from .artifacts import write_json
+from .context import ValidationContext
+from .logging_config import configure_logging
 from .device import HomeEnergyStationClient
 from .fast_state_store import FastStateStore
 from .memory_diagnostics import MemoryDiagnosticClient
@@ -29,20 +31,21 @@ def _transport_from_args(args: argparse.Namespace) -> Transport:
 
 
 def smoke(args: argparse.Namespace) -> int:
-    report = run_embedded_quality_workflow(output=args.output)
+    ctx = ValidationContext(artifacts_dir=Path(args.artifacts_dir), target="sim")
+    report = run_embedded_quality_workflow(output=args.output, context=ctx)
     print(json.dumps(report.quality_gate, indent=2, sort_keys=True))
     return 0 if report.quality_gate["passed"] else 2
 
 
 def validate(args: argparse.Namespace) -> int:
     if args.clean:
-        artifacts = Path("artifacts")
+        artifacts = Path(args.artifacts_dir)
         artifacts.mkdir(exist_ok=True)
         for pattern in ["*.json", "*.jsonl", "*.xml", "*.md"]:
             for path in artifacts.glob(pattern):
                 path.unlink(missing_ok=True)
 
-    smoke_code = smoke(argparse.Namespace(output=args.output))
+    smoke_code = smoke(argparse.Namespace(output=args.output, artifacts_dir=args.artifacts_dir))
     if smoke_code != 0:
         return smoke_code
 
@@ -164,14 +167,17 @@ def build_parser() -> argparse.ArgumentParser:
         prog="eqv",
         description="Embedded quality validation showcase runner.",
     )
+    parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"], help="Console/file log level.")
     sub = parser.add_subparsers(dest="command", required=False)
 
     p_smoke = sub.add_parser("smoke", help="Run a hardware-free embedded validation smoke workflow.")
     p_smoke.add_argument("--output", default="artifacts/local_validation_report.json")
+    p_smoke.add_argument("--artifacts-dir", default="artifacts")
     p_smoke.set_defaults(func=smoke)
 
     p_validate = sub.add_parser("validate", help="Run local validation workflow, optionally followed by pytest/gates.")
     p_validate.add_argument("--output", default="artifacts/local_validation_report.json")
+    p_validate.add_argument("--artifacts-dir", default="artifacts")
     p_validate.add_argument("--with-pytest", action="store_true", help="Run pytest, release quality gate, and triage report.")
     p_validate.add_argument("--clean", action="store_true", help="Remove previous local artifacts before running.")
     p_validate.set_defaults(func=validate)
@@ -209,6 +215,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if not hasattr(args, "func"):
         args = parser.parse_args(["validate", "--with-pytest", "--clean"])
+    configure_logging(level=getattr(args, "log_level", "INFO"), force=False)
     return int(args.func(args))
 
 

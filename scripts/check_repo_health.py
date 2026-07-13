@@ -17,12 +17,15 @@ REQUIRED_PATHS = [
     Path("main.py"),
     Path("src/eqv/cli.py"),
     Path("src/eqv/validation_runner.py"),
+    Path("src/eqv/pipeline.py"),
+    Path("src/eqv/logging_config.py"),
+    Path("src/eqv/exceptions.py"),
     Path("tests"),
     Path("docs/traceability_matrix.md"),
     Path(".github/workflows/ci.yml"),
 ]
 
-REQUIRED_IMPORTS = ["eqv", "eqv.cli", "eqv.device", "eqv.transports", "eqv.validation_runner"]
+REQUIRED_IMPORTS = ["eqv", "eqv.cli", "eqv.device", "eqv.transports", "eqv.validation_runner", "eqv.pipeline", "eqv.logging_config", "eqv.exceptions"]
 
 
 def main() -> int:

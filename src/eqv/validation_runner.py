@@ -1,31 +1,28 @@
 from __future__ import annotations
 
-import traceback
+import logging
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
-from .artifacts import runtime_metadata, write_json
+from .artifacts import ArtifactManager, runtime_metadata
 from .cloud import FakeCloudClient
-from .device import DeviceError, HomeEnergyStationClient
+from .context import ValidationContext
+from .device import HomeEnergyStationClient
+from .exceptions import DeviceError
 from .fast_state_store import FastStateStore
 from .memory_diagnostics import MemoryDiagnosticClient
+from .pipeline import CheckResult, PipelineStage, ValidationPipeline
 from .quality import QualityMetrics, evaluate_release_gate
 from .transports import FakeHilTransport
 
-
-@dataclass(frozen=True)
-class CheckResult:
-    name: str
-    passed: bool
-    critical: bool = True
-    details: dict[str, Any] = field(default_factory=dict)
-    error: str | None = None
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
 class ValidationReport:
     metadata: dict[str, Any]
+    context: dict[str, Any]
     bench: dict[str, Any]
     checks: list[CheckResult]
     quality_gate: dict[str, Any]
@@ -33,11 +30,12 @@ class ValidationReport:
     cloud_records: list[dict[str, Any]]
     memory_reports: list[dict[str, Any]]
     fast_state_snapshot: dict[str, Any]
-    artifact_manifest: dict[str, Any]
+    artifact_manifest: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "metadata": self.metadata,
+            "context": self.context,
             "bench": self.bench,
             "checks": [asdict(check) for check in self.checks],
             "quality_gate": self.quality_gate,
@@ -49,32 +47,23 @@ class ValidationReport:
         }
 
 
-def _check(name: str, func: Callable[[], dict[str, Any] | None], *, critical: bool = True) -> CheckResult:
-    try:
-        details = func() or {}
-        return CheckResult(name=name, passed=True, critical=critical, details=details)
-    except Exception as exc:  # noqa: BLE001 - validation runners must preserve evidence, not hide it
-        return CheckResult(
-            name=name,
-            passed=False,
-            critical=critical,
-            error=repr(exc),
-            details={"traceback_tail": traceback.format_exc().splitlines()[-6:]},
-        )
-
-
 def run_embedded_quality_workflow(
     *,
     low_soc_for_safety_check: float = 15.0,
     output: str | Path | None = "artifacts/local_validation_report.json",
+    context: ValidationContext | None = None,
 ) -> ValidationReport:
     """Run a compact embedded-quality workflow without requiring physical hardware.
 
-    The function deliberately mirrors how a real bench runner would be structured:
-    create a transport, wrap it with a reusable device client, run named checks,
-    collect TX/RX traces, push representative telemetry, evaluate a release gate,
-    and serialize evidence for triage.
+    This mirrors how a real bench runner is structured: create a run context,
+    configure transport/client layers, execute a standard pipeline of named
+    checks, collect TX/RX traces and diagnostic evidence, evaluate a release
+    quality gate, then write artifacts for triage.
     """
+
+    ctx = context or ValidationContext()
+    ctx.artifacts_dir.mkdir(parents=True, exist_ok=True)
+    artifacts = ArtifactManager(ctx.artifacts_dir, run_id=ctx.run_id)
     transport = FakeHilTransport()
     device = HomeEnergyStationClient(transport)
     memory = MemoryDiagnosticClient(device)
@@ -82,14 +71,12 @@ def run_embedded_quality_workflow(
     store = FastStateStore()
     memory_reports: list[dict[str, Any]] = []
 
-    store.set("bench.device_id", "ARA-SIM-0001")
-    store.set("bench.firmware_version", "sim-fw-0.1.0")
+    log.info("run_id=%s embedded validation workflow started target=%s", ctx.run_id, ctx.target)
+
+    store.set("bench.device_id", ctx.device_id)
+    store.set("bench.firmware_version", ctx.firmware_version)
     store.set("bench.transport", type(transport).__name__)
     store.set("cloud.heartbeat", "CONNECTED", ttl_s=30.0)
-
-    checks: list[CheckResult] = []
-
-    checks.append(_check("device_ping", lambda: {"pong": device.ping()}))
 
     def measurement_check() -> dict[str, Any]:
         values = {
@@ -103,10 +90,6 @@ def run_embedded_quality_workflow(
         store.append_stream("telemetry", values)
         return values
 
-    checks.append(_check("power_measurements", measurement_check))
-
-    checks.append(_check("ev_charge_mode", lambda: {"ack_mode": device.set_mode("EV_CHARGE")}))
-
     def v2h_safety_check() -> dict[str, Any]:
         transport.battery_soc_percent = low_soc_for_safety_check
         try:
@@ -115,8 +98,6 @@ def run_embedded_quality_workflow(
             return {"blocked": True, "reason": str(exc), "soc_percent": low_soc_for_safety_check}
         raise AssertionError("V2H_BACKUP was accepted below the SOC safety threshold")
 
-    checks.append(_check("v2h_low_soc_safety_interlock", v2h_safety_check))
-
     def ram_quick_check() -> dict[str, Any]:
         report = memory.run_ram_quick_check()
         memory_reports.append(report.as_dict())
@@ -124,8 +105,6 @@ def run_embedded_quality_workflow(
         store.set("memory.ram.tested_bytes", report.details.get("tested_bytes"))
         assert report.passed, report.as_dict()
         return report.as_dict()
-
-    checks.append(_check("ram_quick_check", ram_quick_check))
 
     def nvm_crc_check() -> dict[str, Any]:
         before = store.snapshot()
@@ -144,16 +123,12 @@ def run_embedded_quality_workflow(
         }
         return details
 
-    checks.append(_check("nvm_crc_integrity", nvm_crc_check))
-
     def nvm_scratch_check() -> dict[str, Any]:
         report = memory.scratch_write_readback(key="bench_counter", value=1)
         memory_reports.append(report.as_dict())
         store.set("memory.nvm.scratch_last_status", report.status)
         assert report.passed, report.as_dict()
         return report.as_dict()
-
-    checks.append(_check("nvm_scratch_write_readback", nvm_scratch_check))
 
     def nvm_schema_check() -> dict[str, Any]:
         report = memory.validate_nvm_schema()
@@ -162,8 +137,6 @@ def run_embedded_quality_workflow(
         assert report.passed, report.as_dict()
         return report.as_dict()
 
-    checks.append(_check("nvm_schema_validate", nvm_schema_check))
-
     def factory_lock_check() -> dict[str, Any]:
         report = memory.verify_factory_region_locked()
         memory_reports.append(report.as_dict())
@@ -171,16 +144,12 @@ def run_embedded_quality_workflow(
         assert report.passed, report.as_dict()
         return report.as_dict()
 
-    checks.append(_check("nvm_factory_region_locked", factory_lock_check))
-
     def wear_level_check() -> dict[str, Any]:
         report = memory.read_wear_level_stats()
         memory_reports.append(report.as_dict())
         store.set("memory.nvm.erase_write_cycles", report.details.get("erase_write_cycles"))
         assert report.status in {"PASS", "WARN"}
         return report.as_dict()
-
-    checks.append(_check("nvm_wear_level_stats", wear_level_check, critical=False))
 
     def fast_cache_sanity_check() -> dict[str, Any]:
         before = store.snapshot()
@@ -195,8 +164,6 @@ def run_embedded_quality_workflow(
             "diff": FastStateStore.diff(before, after),
         }
 
-    checks.append(_check("fast_state_store_cached_nvm_crc", fast_cache_sanity_check, critical=False))
-
     def cloud_telemetry_check() -> dict[str, Any]:
         transport.battery_soc_percent = 83.0
         payload = {
@@ -206,60 +173,89 @@ def run_embedded_quality_workflow(
             "battery_soc_percent": round(device.read_measurement("battery_soc_percent"), 2),
             "nvm_crc": store.get("memory.nvm.crc"),
         }
-        ack = cloud.publish_telemetry("ARA-SIM-0001", payload)
+        ack = cloud.publish_telemetry(ctx.device_id, payload)
         assert ack["accepted"] is True
         store.append_stream("cloud_acks", ack)
         return {"cloud_ack": ack, "payload": payload}
 
-    checks.append(_check("device_to_cloud_telemetry", cloud_telemetry_check))
+    stages = [
+        PipelineStage("device_ping", lambda: {"pong": device.ping()}),
+        PipelineStage("power_measurements", measurement_check),
+        PipelineStage("ev_charge_mode", lambda: {"ack_mode": device.set_mode("EV_CHARGE")}),
+        PipelineStage("v2h_low_soc_safety_interlock", v2h_safety_check),
+        PipelineStage("ram_quick_check", ram_quick_check),
+        PipelineStage("nvm_crc_integrity", nvm_crc_check),
+        PipelineStage("nvm_scratch_write_readback", nvm_scratch_check),
+        PipelineStage("nvm_schema_validate", nvm_schema_check),
+        PipelineStage("nvm_factory_region_locked", factory_lock_check),
+        PipelineStage("nvm_wear_level_stats", wear_level_check, critical=False),
+        PipelineStage("fast_state_store_cached_nvm_crc", fast_cache_sanity_check, critical=False),
+        PipelineStage("device_to_cloud_telemetry", cloud_telemetry_check),
+    ]
 
+    checks = ValidationPipeline(run_id=ctx.run_id).run(stages)
     failed = sum(not item.passed for item in checks)
     critical = sum((not item.passed) and item.critical for item in checks)
-    memory_release_blockers = sum(1 for report in memory_reports if report["status"] != "PASS" and report["severity"] == "release_blocker")
+    memory_release_blockers = sum(
+        1 for report in memory_reports if report["status"] != "PASS" and report["severity"] == "release_blocker"
+    )
     gate = evaluate_release_gate(
         QualityMetrics(
             total_tests=len(checks),
             failed_tests=failed,
             flaky_tests=0,
             critical_failures=critical,
-            duration_s=sum(float(item.details.get("duration_s", 0.0)) for item in checks),
+            duration_s=sum(item.duration_s for item in checks),
             memory_release_blockers=memory_release_blockers,
             required_artifacts_present=True,
         ),
         min_pass_rate=1.0,
         max_flakiness_rate=0.0,
     )
-    artifact_manifest = {
-        "local_validation_report": str(output) if output else None,
-        "contains": [
-            "runtime_metadata",
-            "bench_metadata",
-            "named_check_results",
-            "memory_diagnostic_reports",
-            "device_tx_rx_trace",
-            "cloud_records",
-            "fast_state_snapshot",
-            "quality_gate_decision",
-        ],
+
+    bench = {
+        "bench_type": ctx.bench_type,
+        "device_id": ctx.device_id,
+        "firmware_version": ctx.firmware_version,
+        "os_image": ctx.os_image,
+        "transport": type(transport).__name__,
+        "replaceable_by": ["SerialTransport", "CAN adapter", "Modbus adapter", "Ethernet adapter"],
     }
     report = ValidationReport(
         metadata=runtime_metadata(),
-        bench={
-            "bench_type": "deterministic_simulated_hil",
-            "device_id": "ARA-SIM-0001",
-            "firmware_version": "sim-fw-0.1.0",
-            "os_image": "sim-linux-qa",
-            "transport": type(transport).__name__,
-            "replaceable_by": ["SerialTransport", "CAN adapter", "Modbus adapter", "Ethernet adapter"],
-        },
+        context=ctx.as_dict(),
+        bench=bench,
         checks=checks,
         quality_gate={"passed": gate.passed, "reasons": gate.reasons},
         device_trace=transport.trace,
         cloud_records=cloud.messages,
         memory_reports=memory_reports,
         fast_state_snapshot=store.snapshot(),
-        artifact_manifest=artifact_manifest,
+    )
+
+    if output:
+        output_path = Path(output)
+        from .artifacts import write_json
+
+        write_json(output_path, report.as_dict())
+        artifacts.register(output_path, purpose="main validation report with checks, trace, memory, cloud and gate evidence")
+    artifacts.register(ctx.path("validation.log"), purpose="structured console/file log for this validation run")
+    manifest_path = artifacts.write_manifest()
+    report = ValidationReport(
+        metadata=report.metadata,
+        context=report.context,
+        bench=report.bench,
+        checks=report.checks,
+        quality_gate=report.quality_gate,
+        device_trace=report.device_trace,
+        cloud_records=report.cloud_records,
+        memory_reports=report.memory_reports,
+        fast_state_snapshot=report.fast_state_snapshot,
+        artifact_manifest={"path": str(manifest_path), "artifacts": artifacts.manifest},
     )
     if output:
+        from .artifacts import write_json
+
         write_json(output, report.as_dict())
+    log.info("run_id=%s embedded validation workflow completed gate_passed=%s", ctx.run_id, gate.passed)
     return report

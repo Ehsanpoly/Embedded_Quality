@@ -3,6 +3,10 @@
 __all__ = [
     "artifacts",
     "cloud",
+    "pipeline",
+    "logging_config",
+    "exceptions",
+    "context",
     "device",
     "fast_state_store",
     "memory_diagnostics",
@@ -14,4 +18,4 @@ __all__ = [
     "validation_runner",
 ]
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"

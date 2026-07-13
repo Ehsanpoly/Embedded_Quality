@@ -8,16 +8,18 @@ endif
 PY := $(BIN)/python
 PIP := $(PY) -m pip
 
-.PHONY: help venv install install-dev smoke test validate gate triage coverage health clean ci demo
+.PHONY: help venv install install-dev install-package smoke test fixture-demo validate gate triage coverage health clean ci demo exe
 
 help:
 	@echo "Embedded Quality Validation Showcase"
 	@echo "  make install-dev  Create venv and install editable dev package"
 	@echo "  make smoke        Run fast in-process validation workflow"
 	@echo "  make test         Run pytest validation suite"
+	@echo "  make fixture-demo Run advanced fixture pattern examples"
 	@echo "  make validate     Run smoke + pytest + quality gate + triage"
 	@echo "  make coverage     Run coverage report"
 	@echo "  make clean        Remove generated artifacts and caches"
+	@echo "  make exe          Build one-file CLI executable with PyInstaller"
 
 venv:
 	$(PYTHON) -m venv $(VENV)
@@ -30,32 +32,42 @@ install-dev: venv
 	$(PIP) install --upgrade pip setuptools wheel
 	$(PIP) install -e ".[dev]"
 
+install-package: venv
+	$(PIP) install --upgrade pip setuptools wheel
+	$(PIP) install -e ".[dev,package]"
+
 smoke:
-	$(PYTHON) main.py smoke --output artifacts/smoke_report.json
+	$(PY) main.py smoke --output artifacts/smoke_report.json
 
 test:
-	$(PYTHON) -m pytest
+	$(PY) -m pytest
+
+fixture-demo:
+	$(PY) -m pytest tests/test_advanced_fixtures.py -q
 
 validate:
-	$(PYTHON) main.py validate --with-pytest --clean
+	$(PY) main.py validate --with-pytest --clean
 
 gate:
-	$(PYTHON) scripts/run_quality_gate.py
+	$(PY) scripts/run_quality_gate.py
 
 triage:
-	$(PYTHON) scripts/triage_report.py
+	$(PY) scripts/triage_report.py
 
 coverage:
-	$(PYTHON) -m pytest --cov=eqv --cov-report=term-missing
+	$(PY) -m pytest --cov=eqv --cov-report=term-missing
+
+exe: install-package
+	$(PY) scripts/build_executable.py
 
 health:
-	$(PYTHON) scripts/check_repo_health.py
+	$(PY) scripts/check_repo_health.py
 
 ci: health test gate triage
 
 demo:
-	$(PYTHON) main.py smoke --output artifacts/demo_report.json
-	$(PYTHON) main.py bench-info --output artifacts/bench_info.json
+	$(PY) main.py smoke --output artifacts/demo_report.json
+	$(PY) main.py bench-info --output artifacts/bench_info.json
 
 clean:
 	rm -rf .pytest_cache .ruff_cache .mypy_cache htmlcov dist build *.egg-info src/*.egg-info
@@ -64,16 +76,16 @@ clean:
 
 .PHONY: memory-sanity
 memory-sanity:
-	$(PYTHON) main.py memory-sanity --target sim
+	$(PY) main.py memory-sanity --target sim
 
 .PHONY: nvm-check
 nvm-check:
-	$(PYTHON) main.py nvm-check --target sim
+	$(PY) main.py nvm-check --target sim
 
 .PHONY: fast-gate
 fast-gate:
-	$(PYTHON) main.py fast-gate
+	$(PY) main.py fast-gate
 
 .PHONY: endurance-plan
 endurance-plan:
-	$(PYTHON) main.py endurance-plan
+	$(PY) main.py endurance-plan

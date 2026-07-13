@@ -65,7 +65,10 @@ scripts/
   triage_report.py              markdown triage artifact
   check_repo_health.py          fast import/structure gate
 tests/                          protocol, HIL, memory, cloud, regression, quality-gate tests
+  conftest.py                   fixture architecture, factories, autouse lifecycle recording
+  test_advanced_fixtures.py     parametrized fixtures, factory fixtures, autouse fixture evidence
 docs/                           strategy, runbook, memory validation, quality gate, artifacts
+  fixture_patterns.md           advanced pytest fixture mechanics and lifecycle explanation
 .github/workflows/ci.yml        CI quality gate and artifact upload
 main.py                         repository-level entry point
 Makefile                        Linux/macOS automation
@@ -136,6 +139,34 @@ run_validation.bat
 | Field-log regression | field events mapped to permanent regression families |
 | CI quality gates | pass rate, flakiness, critical failures, memory blockers, duration, artifacts |
 | Artifact collection | JUnit XML, test events, validation report, memory reports, triage report |
+| Advanced fixtures | parametrized scenarios, dynamic factory fixtures, autouse setup/teardown lifecycle records |
+
+
+## Advanced pytest fixture patterns
+
+Version 0.5 adds a stronger pytest fixture layer for embedded-quality test architecture.
+
+| Fixture pattern | Where | Why it matters |
+|---|---|---|
+| Parametrized fixture | `energy_scenario`, `memory_fault_case` in `tests/conftest.py` | Runs one test multiple times across different PV/EV/grid/SOC profiles or memory fault cases. |
+| Factory fixture | `device_factory`, `memory_client_factory` in `tests/conftest.py` | Lets a test build a device or memory diagnostic client with dynamic arguments such as low SOC, cloud disconnected, NVM schema mismatch, or injected faults. |
+| Autouse fixture | `record_fixture_lifecycle` in `tests/conftest.py` | Runs automatically for every test and records setup/teardown lifecycle evidence in `artifacts/fixture_lifecycle.jsonl`. |
+| Session fixture | `validation_session_metadata` in `tests/conftest.py` | Demonstrates run-level metadata created once per pytest execution. |
+
+Run the fixture showcase directly:
+
+```bash
+python -m pytest tests/test_advanced_fixtures.py -q
+```
+
+Useful output:
+
+```bash
+python -m json.tool artifacts/quality_gate.json
+cat artifacts/fixture_lifecycle.jsonl
+```
+
+Read the complete explanation in `docs/fixture_patterns.md`.
 
 ## RAM and EEPROM/NVM testing strategy
 
@@ -214,3 +245,124 @@ Artifacts are produced after validation commands, pytest runs, and quality-gate 
 ## Professional positioning
 
 The important message is not that the simulator is complex. The message is that the validation architecture is scalable: tests are readable, transports are replaceable, failures produce artifacts, field issues become regressions, memory diagnostics are release-gated, and quality decisions are automatic.
+
+## Error handling, logging, and connected pipeline upgrade
+
+Version 0.4 adds a more production-style execution path. The validation flow is no longer only a collection of functions; it now has explicit run context, structured exceptions, a standard pipeline stage model, and log artifacts.
+
+```text
+CLI / main.py
+  ↓
+ValidationContext                         run_id, target, firmware, artifacts folder
+  ↓
+configure_logging                         console + artifacts/validation.log
+  ↓
+ValidationPipeline                        standard stage runner with timing and error capture
+  ↓
+PipelineStage                             device, memory, cloud, cache, safety, telemetry checks
+  ↓
+Transport + Device + Diagnostics clients  simulator today, serial/CAN/Modbus/Ethernet later
+  ↓
+ArtifactManager                           JSON reports, manifest, logs, triage, quality gate
+```
+
+New files:
+
+| File | Responsibility |
+|---|---|
+| `src/eqv/exceptions.py` | Structured framework errors with context: service, operation, target, run ID, details. |
+| `src/eqv/logging_config.py` | UTC console/file logging; creates `artifacts/validation.log`. |
+| `src/eqv/context.py` | Run-level metadata passed from CLI to pipeline and artifacts. |
+| `src/eqv/pipeline.py` | Standard `PipelineStage` and `ValidationPipeline` execution model. |
+| `tests/test_error_handling_logging.py` | Confirms structured error evidence and pipeline failure capture. |
+| `scripts/build_executable.py` | Optional PyInstaller one-file CLI build. |
+| `build_executable.bat` | Windows helper for building the executable. |
+
+The important quality message is that a failed validation stage now produces evidence instead of disappearing as a generic Python traceback. A check result includes stage name, pass/fail status, criticality, duration, details, structured error context, and traceback tail.
+
+## Production smoke test vs full product test
+
+A production smoke test is a fast, high-signal subset of product validation. It usually tests **both firmware and hardware interaction**, but not with the same depth as a full release qualification campaign.
+
+| Test level | What it tests | Typical trigger |
+|---|---|---|
+| Simulator smoke | Python framework, protocol framing, expected device behavior model | every commit / CI |
+| Hardware smoke | board boots, firmware responds, serial/CAN/Ethernet pipeline works, basic services work | bench check / release candidate |
+| Firmware logic test | state machines, safety interlocks, RAM/NVM diagnostic services, OTA states | PR, nightly, release branch |
+| Hardware validation | sensors, relays/contactors, power path, analog front end, physical timing, thermal/load effects | HIL bench / lab |
+| System validation | firmware + hardware + cloud + mobile/backend + real operating scenarios | release qualification |
+
+In this showcase, automated tests cover protocol behavior, simulated device services, firmware-style RAM/NVM reports, safety interlock behavior, telemetry/cloud interaction, field-log regression mapping, and quality-gate evidence. Real physical hardware would be connected by replacing `FakeHilTransport` with `SerialTransport` or another adapter while keeping the same tests.
+
+## Makefile and executable build
+
+Linux/macOS or Git Bash:
+
+```bash
+make help
+make install-dev
+make validate
+make memory-sanity
+make nvm-check
+make fast-gate
+make coverage
+```
+
+Build a one-file CLI executable with PyInstaller:
+
+```bash
+make exe
+# result: dist/eqv-showcase or dist/eqv-showcase.exe depending on OS
+```
+
+Windows without Make:
+
+```bat
+bootstrap_dev.bat
+run_validation.bat
+build_executable.bat
+```
+
+After building, test the executable:
+
+```bash
+./dist/eqv-showcase smoke
+./dist/eqv-showcase memory-sanity --target sim
+```
+
+On Windows:
+
+```bat
+dist\eqv-showcase.exe smoke
+dist\eqv-showcase.exe memory-sanity --target sim
+```
+
+## Interview demo command list
+
+Use this sequence for a live demo:
+
+```bash
+python -m pip install -e ".[dev]"
+python scripts/check_repo_health.py
+python main.py smoke --output artifacts/local_validation_report.json
+python main.py memory-sanity --target sim
+python main.py nvm-check --target sim
+python main.py fast-gate
+python -m pytest
+python scripts/run_quality_gate.py
+python scripts/triage_report.py
+```
+
+Important output files to open during the interview:
+
+```text
+artifacts/local_validation_report.json
+artifacts/memory_sanity.json
+artifacts/nvm_check.json
+artifacts/fast_gate.json
+artifacts/test_events.jsonl
+artifacts/quality_gate.json
+artifacts/triage_report.md
+artifacts/validation.log
+artifacts/artifact_manifest.json
+```
