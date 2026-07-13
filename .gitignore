@@ -16,8 +16,8 @@ venv/
 .env
 
 # Generated validation evidence
-artifacts/*
-!artifacts/.gitkeep
+# artifacts/*
+# !artifacts/.gitkeep
 
 # OS / editor
 .DS_Store

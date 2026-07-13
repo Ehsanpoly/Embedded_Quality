@@ -1,0 +1,80 @@
+2026-07-13T22:04:03Z INFO     eqv.validation_runner :: run_id=38f921c2f292 embedded validation workflow started target=sim
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=device_ping status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=device_ping status=PASS duration_s=0.0001
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=power_measurements status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=power_measurements status=PASS duration_s=0.0002
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=ev_charge_mode status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=ev_charge_mode status=PASS duration_s=0.0001
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=v2h_low_soc_safety_interlock status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=v2h_low_soc_safety_interlock status=PASS duration_s=0.0001
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=ram_quick_check status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.memory_diagnostics :: memory diagnostic service=RAM_QUICK_CHECK test=ram_quick_check status=PASS severity=release_blocker
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=ram_quick_check status=PASS duration_s=0.0007
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_crc_integrity status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_CRC_CHECK test=nvm_crc_integrity status=PASS severity=release_blocker
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_crc_integrity status=PASS duration_s=0.0007
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_scratch_write_readback status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_SCRATCH_WRITE_READBACK test=nvm_scratch_write_readback status=PASS severity=release_blocker
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_scratch_write_readback status=PASS duration_s=0.0008
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_schema_validate status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_SCHEMA_VALIDATE test=nvm_schema_validate status=PASS severity=release_blocker
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_schema_validate status=PASS duration_s=0.0015
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_factory_region_locked status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_FACTORY_REGION_LOCKED test=nvm_factory_region_locked status=PASS severity=release_blocker
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_factory_region_locked status=PASS duration_s=0.0012
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_wear_level_stats status=START critical=False
+2026-07-13T22:04:03Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_WEAR_LEVEL_STATS test=nvm_wear_level_stats status=PASS severity=warning
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=nvm_wear_level_stats status=PASS duration_s=0.0010
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=fast_state_store_cached_nvm_crc status=START critical=False
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=fast_state_store_cached_nvm_crc status=PASS duration_s=0.0001
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=device_to_cloud_telemetry status=START critical=True
+2026-07-13T22:04:03Z INFO     eqv.pipeline :: run_id=38f921c2f292 stage=device_to_cloud_telemetry status=PASS duration_s=0.0003
+2026-07-13T22:04:03Z INFO     eqv.validation_runner :: run_id=38f921c2f292 embedded validation workflow completed gate_passed=True
+2026-07-13T22:04:04Z INFO     eqv.memory_diagnostics :: memory diagnostic service=RAM_QUICK_CHECK test=ram_quick_check status=PASS severity=release_blocker
+2026-07-13T22:04:04Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_CRC_CHECK test=nvm_crc_integrity status=PASS severity=release_blocker
+2026-07-13T22:04:04Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_SCRATCH_WRITE_READBACK test=nvm_scratch_write_readback status=PASS severity=release_blocker
+2026-07-13T22:04:04Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_FACTORY_REGION_LOCKED test=nvm_factory_region_locked status=PASS severity=release_blocker
+2026-07-13T22:04:04Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_CRC_CHECK test=nvm_crc_integrity status=PASS severity=release_blocker
+2026-07-13T22:04:04Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_SCHEMA_VALIDATE test=nvm_schema_validate status=PASS severity=release_blocker
+2026-07-13T22:04:04Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_FACTORY_REGION_LOCKED test=nvm_factory_region_locked status=PASS severity=release_blocker
+2026-07-13T22:04:04Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_WEAR_LEVEL_STATS test=nvm_wear_level_stats status=PASS severity=warning
+2026-07-13T23:36:00Z INFO     eqv.validation_runner :: run_id=b7800c571bed embedded validation workflow started target=sim
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=device_ping status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=device_ping status=PASS duration_s=0.0001
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=power_measurements status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=power_measurements status=PASS duration_s=0.0002
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=ev_charge_mode status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=ev_charge_mode status=PASS duration_s=0.0001
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=v2h_low_soc_safety_interlock status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=v2h_low_soc_safety_interlock status=PASS duration_s=0.0001
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=ram_quick_check status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.memory_diagnostics :: memory diagnostic service=RAM_QUICK_CHECK test=ram_quick_check status=PASS severity=release_blocker
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=ram_quick_check status=PASS duration_s=0.0007
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_crc_integrity status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_CRC_CHECK test=nvm_crc_integrity status=PASS severity=release_blocker
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_crc_integrity status=PASS duration_s=0.0006
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_scratch_write_readback status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_SCRATCH_WRITE_READBACK test=nvm_scratch_write_readback status=PASS severity=release_blocker
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_scratch_write_readback status=PASS duration_s=0.0007
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_schema_validate status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_SCHEMA_VALIDATE test=nvm_schema_validate status=PASS severity=release_blocker
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_schema_validate status=PASS duration_s=0.0011
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_factory_region_locked status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_FACTORY_REGION_LOCKED test=nvm_factory_region_locked status=PASS severity=release_blocker
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_factory_region_locked status=PASS duration_s=0.0007
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_wear_level_stats status=START critical=False
+2026-07-13T23:36:00Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_WEAR_LEVEL_STATS test=nvm_wear_level_stats status=PASS severity=warning
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=nvm_wear_level_stats status=PASS duration_s=0.0007
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=fast_state_store_cached_nvm_crc status=START critical=False
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=fast_state_store_cached_nvm_crc status=PASS duration_s=0.0000
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=device_to_cloud_telemetry status=START critical=True
+2026-07-13T23:36:00Z INFO     eqv.pipeline :: run_id=b7800c571bed stage=device_to_cloud_telemetry status=PASS duration_s=0.0002
+2026-07-13T23:36:00Z INFO     eqv.validation_runner :: run_id=b7800c571bed embedded validation workflow completed gate_passed=True
+2026-07-13T23:36:02Z INFO     eqv.memory_diagnostics :: memory diagnostic service=RAM_QUICK_CHECK test=ram_quick_check status=PASS severity=release_blocker
+2026-07-13T23:36:02Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_CRC_CHECK test=nvm_crc_integrity status=PASS severity=release_blocker
+2026-07-13T23:36:02Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_SCRATCH_WRITE_READBACK test=nvm_scratch_write_readback status=PASS severity=release_blocker
+2026-07-13T23:36:02Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_FACTORY_REGION_LOCKED test=nvm_factory_region_locked status=PASS severity=release_blocker
+2026-07-13T23:36:02Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_CRC_CHECK test=nvm_crc_integrity status=PASS severity=release_blocker
+2026-07-13T23:36:02Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_SCHEMA_VALIDATE test=nvm_schema_validate status=PASS severity=release_blocker
+2026-07-13T23:36:02Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_FACTORY_REGION_LOCKED test=nvm_factory_region_locked status=PASS severity=release_blocker
+2026-07-13T23:36:02Z INFO     eqv.memory_diagnostics :: memory diagnostic service=NVM_WEAR_LEVEL_STATS test=nvm_wear_level_stats status=PASS severity=warning

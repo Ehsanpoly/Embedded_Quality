@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "reasons": [],
+  "meters": {
+    "total_tests": 33,
+    "failed_tests": 0,
+    "pass_rate": 1.0,
+    "flaky_tests": 0,
+    "flakiness_rate": 0.0,
+    "critical_failures": 0,
+    "memory_release_blockers": 0,
+    "duration_s": 0.178,
+    "required_artifacts_present": true
+  },
+  "required_artifacts": [
+    "artifacts\\test_events.jsonl",
+    "artifacts\\junit.xml"
+  ]
+}

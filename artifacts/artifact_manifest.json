@@ -1,0 +1,18 @@
+{
+  "artifacts": [
+    {
+      "exists": true,
+      "path": "C:\\Users\\Hanane\\AppData\\Local\\Temp\\pytest-of-Hanane\\pytest-9\\test_validation_runner_keeps_v0\\validation_report.json",
+      "purpose": "main validation report with checks, trace, memory, cloud and gate evidence",
+      "size_bytes": 16802
+    },
+    {
+      "exists": true,
+      "path": "artifacts\\validation.log",
+      "purpose": "structured console/file log for this validation run",
+      "size_bytes": 9748
+    }
+  ],
+  "generated_at_utc": "2026-07-13T23:36:01+00:00",
+  "run_id": "4af483a9bad4"
+}

@@ -1,0 +1,21 @@
+{
+  "after": {
+    "cloud.heartbeat": "CONNECTED",
+    "device.firmware_version": "sim-fw-0.1.0",
+    "memory.nvm.crc": "0x91AF",
+    "validation.full_nvm_scan_skipped": true
+  },
+  "before": {
+    "cloud.heartbeat": "CONNECTED",
+    "device.firmware_version": "sim-fw-0.1.0",
+    "memory.nvm.crc": "0x91AF"
+  },
+  "decision": "PASS",
+  "dirty_keys": [
+    "cloud.heartbeat",
+    "device.firmware_version",
+    "memory.nvm.crc",
+    "validation.full_nvm_scan_skipped"
+  ],
+  "reason": "NVM CRC unchanged in fast host state cache"
+}

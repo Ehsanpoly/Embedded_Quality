@@ -1,0 +1,35 @@
+{
+  "memory_endurance_examples": [
+    "bounded EEPROM scratch-page write/readback cycling",
+    "power-cycle recovery while NVM transaction is active",
+    "OTA migration against old NVM schema snapshots",
+    "RAM canary and stack-watermark monitoring under long workload"
+  ],
+  "purpose": "Long-running tests that should not block every PR but should inform release readiness.",
+  "tiers": [
+    {
+      "duration": "5-15 seconds",
+      "level": "L0",
+      "name": "simulator sanity",
+      "trigger": "every commit"
+    },
+    {
+      "duration": "30-90 seconds",
+      "level": "L1",
+      "name": "hardware smoke",
+      "trigger": "bench check / PR label"
+    },
+    {
+      "duration": "5-20 minutes",
+      "level": "L2",
+      "name": "HIL regression",
+      "trigger": "nightly or release candidate"
+    },
+    {
+      "duration": "hours",
+      "level": "L3",
+      "name": "endurance",
+      "trigger": "overnight / weekly / release branch"
+    }
+  ]
+}

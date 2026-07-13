@@ -1,0 +1,33 @@
+{"nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[sunny_self_consumption]", "outcome": "passed", "duration_s": 0.000506, "markers": ["hil"]}
+{"nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[evening_ev_charge]", "outcome": "passed", "duration_s": 0.000456, "markers": ["hil"]}
+{"nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[backup_ready_high_soc]", "outcome": "passed", "duration_s": 0.000753, "markers": ["hil"]}
+{"nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[healthy_nvm]", "outcome": "passed", "duration_s": 0.000735, "markers": ["release_gate", "memory"]}
+{"nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[crc_mismatch_release_blocker]", "outcome": "passed", "duration_s": 0.001379, "markers": ["release_gate", "memory"]}
+{"nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[scratch_stuck_bit_release_blocker]", "outcome": "passed", "duration_s": 0.002026, "markers": ["release_gate", "memory"]}
+{"nodeid": "tests/test_advanced_fixtures.py::test_factory_fixture_creates_dynamic_low_soc_safety_bench", "outcome": "passed", "duration_s": 0.000827, "markers": ["hil"]}
+{"nodeid": "tests/test_advanced_fixtures.py::test_factory_fixture_creates_dynamic_schema_mismatch", "outcome": "passed", "duration_s": 0.00072, "markers": ["memory"]}
+{"nodeid": "tests/test_advanced_fixtures.py::test_autouse_fixture_records_lifecycle_without_being_requested", "outcome": "passed", "duration_s": 0.013485, "markers": []}
+{"nodeid": "tests/test_advanced_fixtures.py::test_session_fixture_metadata_is_reused", "outcome": "passed", "duration_s": 0.000243, "markers": []}
+{"nodeid": "tests/test_cli_entrypoint.py::test_cli_smoke_writes_report", "outcome": "passed", "duration_s": 0.107065, "markers": []}
+{"nodeid": "tests/test_device_workflows.py::test_device_ping_and_measurements_are_observable", "outcome": "passed", "duration_s": 0.000398, "markers": ["release_gate", "hil"]}
+{"nodeid": "tests/test_device_workflows.py::test_v2h_mode_is_blocked_when_soc_is_too_low", "outcome": "passed", "duration_s": 0.000362, "markers": ["release_gate", "hil"]}
+{"nodeid": "tests/test_device_workflows.py::test_ev_charge_mode_acknowledged", "outcome": "passed", "duration_s": 0.000314, "markers": ["release_gate", "hil"]}
+{"nodeid": "tests/test_device_workflows.py::test_device_to_cloud_telemetry_round_trip", "outcome": "passed", "duration_s": 0.000496, "markers": ["release_gate", "cloud"]}
+{"nodeid": "tests/test_error_handling_logging.py::test_device_error_contains_structured_context", "outcome": "passed", "duration_s": 0.000279, "markers": []}
+{"nodeid": "tests/test_error_handling_logging.py::test_pipeline_preserves_exception_evidence", "outcome": "passed", "duration_s": 0.00236, "markers": []}
+{"nodeid": "tests/test_fast_state_store.py::test_cached_crc_skips_expensive_nvm_scan", "outcome": "passed", "duration_s": 0.00042, "markers": []}
+{"nodeid": "tests/test_fast_state_store.py::test_snapshot_diff_reports_changed_keys", "outcome": "passed", "duration_s": 0.000394, "markers": []}
+{"nodeid": "tests/test_fast_state_store.py::test_stream_keeps_telemetry_events", "outcome": "passed", "duration_s": 0.000262, "markers": []}
+{"nodeid": "tests/test_memory_diagnostics.py::test_ram_quick_check_passes", "outcome": "passed", "duration_s": 0.000763, "markers": ["release_gate"]}
+{"nodeid": "tests/test_memory_diagnostics.py::test_nvm_crc_mismatch_blocks_release", "outcome": "passed", "duration_s": 0.000987, "markers": ["release_gate"]}
+{"nodeid": "tests/test_memory_diagnostics.py::test_eeprom_scratch_write_readback", "outcome": "passed", "duration_s": 0.000826, "markers": ["release_gate"]}
+{"nodeid": "tests/test_memory_diagnostics.py::test_factory_region_is_read_only", "outcome": "passed", "duration_s": 0.000723, "markers": ["release_gate"]}
+{"nodeid": "tests/test_protocol_frame.py::test_crc16_modbus_known_vector", "outcome": "passed", "duration_s": 0.000255, "markers": []}
+{"nodeid": "tests/test_protocol_frame.py::test_frame_round_trip", "outcome": "passed", "duration_s": 0.000463, "markers": []}
+{"nodeid": "tests/test_protocol_frame.py::test_frame_rejects_corrupted_crc", "outcome": "passed", "duration_s": 0.000342, "markers": []}
+{"nodeid": "tests/test_quality_gate.py::test_release_gate_passes_for_stable_build", "outcome": "passed", "duration_s": 0.000282, "markers": []}
+{"nodeid": "tests/test_quality_gate.py::test_release_gate_blocks_flaky_or_critical_build", "outcome": "passed", "duration_s": 0.000272, "markers": []}
+{"nodeid": "tests/test_quality_gate.py::test_release_gate_blocks_memory_release_blockers", "outcome": "passed", "duration_s": 0.000391, "markers": []}
+{"nodeid": "tests/test_regression_field_log.py::test_field_logs_are_mapped_to_regression_families", "outcome": "passed", "duration_s": 0.000766, "markers": ["regression"]}
+{"nodeid": "tests/test_validation_runner.py::test_validation_runner_generates_release_evidence", "outcome": "passed", "duration_s": 0.023781, "markers": []}
+{"nodeid": "tests/test_validation_runner.py::test_validation_runner_keeps_v2h_safety_as_critical_check", "outcome": "passed", "duration_s": 0.014377, "markers": []}

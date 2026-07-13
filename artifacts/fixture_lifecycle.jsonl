@@ -1,0 +1,66 @@
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[sunny_self_consumption]", "scope": "function"}
+{"duration_s": 0.009775, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[sunny_self_consumption]", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[evening_ev_charge]", "scope": "function"}
+{"duration_s": 0.01191, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[evening_ev_charge]", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[backup_ready_high_soc]", "scope": "function"}
+{"duration_s": 0.003421, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_energy_scenarios_run_same_test_against_multiple_profiles[backup_ready_high_soc]", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[healthy_nvm]", "scope": "function"}
+{"duration_s": 0.00287, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[healthy_nvm]", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[crc_mismatch_release_blocker]", "scope": "function"}
+{"duration_s": 0.004343, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[crc_mismatch_release_blocker]", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[scratch_stuck_bit_release_blocker]", "scope": "function"}
+{"duration_s": 0.005018, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_parametrized_memory_fault_cases_are_release_gate_ready[scratch_stuck_bit_release_blocker]", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_factory_fixture_creates_dynamic_low_soc_safety_bench", "scope": "function"}
+{"duration_s": 0.003301, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_factory_fixture_creates_dynamic_low_soc_safety_bench", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_factory_fixture_creates_dynamic_schema_mismatch", "scope": "function"}
+{"duration_s": 0.003056, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_factory_fixture_creates_dynamic_schema_mismatch", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_autouse_fixture_records_lifecycle_without_being_requested", "scope": "function"}
+{"duration_s": 0.015478, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_autouse_fixture_records_lifecycle_without_being_requested", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_session_fixture_metadata_is_reused", "scope": "function"}
+{"duration_s": 0.002385, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_advanced_fixtures.py::test_session_fixture_metadata_is_reused", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_cli_entrypoint.py::test_cli_smoke_writes_report", "scope": "function"}
+{"duration_s": 0.114736, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_cli_entrypoint.py::test_cli_smoke_writes_report", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_device_workflows.py::test_device_ping_and_measurements_are_observable", "scope": "function"}
+{"duration_s": 0.002444, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_device_workflows.py::test_device_ping_and_measurements_are_observable", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_device_workflows.py::test_v2h_mode_is_blocked_when_soc_is_too_low", "scope": "function"}
+{"duration_s": 0.002346, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_device_workflows.py::test_v2h_mode_is_blocked_when_soc_is_too_low", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_device_workflows.py::test_ev_charge_mode_acknowledged", "scope": "function"}
+{"duration_s": 0.002516, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_device_workflows.py::test_ev_charge_mode_acknowledged", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_device_workflows.py::test_device_to_cloud_telemetry_round_trip", "scope": "function"}
+{"duration_s": 0.002819, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_device_workflows.py::test_device_to_cloud_telemetry_round_trip", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_error_handling_logging.py::test_device_error_contains_structured_context", "scope": "function"}
+{"duration_s": 0.002504, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_error_handling_logging.py::test_device_error_contains_structured_context", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_error_handling_logging.py::test_pipeline_preserves_exception_evidence", "scope": "function"}
+{"duration_s": 0.004632, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_error_handling_logging.py::test_pipeline_preserves_exception_evidence", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_fast_state_store.py::test_cached_crc_skips_expensive_nvm_scan", "scope": "function"}
+{"duration_s": 0.003094, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_fast_state_store.py::test_cached_crc_skips_expensive_nvm_scan", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_fast_state_store.py::test_snapshot_diff_reports_changed_keys", "scope": "function"}
+{"duration_s": 0.003003, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_fast_state_store.py::test_snapshot_diff_reports_changed_keys", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_fast_state_store.py::test_stream_keeps_telemetry_events", "scope": "function"}
+{"duration_s": 0.00232, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_fast_state_store.py::test_stream_keeps_telemetry_events", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_memory_diagnostics.py::test_ram_quick_check_passes", "scope": "function"}
+{"duration_s": 0.002839, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_memory_diagnostics.py::test_ram_quick_check_passes", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_memory_diagnostics.py::test_nvm_crc_mismatch_blocks_release", "scope": "function"}
+{"duration_s": 0.003098, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_memory_diagnostics.py::test_nvm_crc_mismatch_blocks_release", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_memory_diagnostics.py::test_eeprom_scratch_write_readback", "scope": "function"}
+{"duration_s": 0.003402, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_memory_diagnostics.py::test_eeprom_scratch_write_readback", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_memory_diagnostics.py::test_factory_region_is_read_only", "scope": "function"}
+{"duration_s": 0.002744, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_memory_diagnostics.py::test_factory_region_is_read_only", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_protocol_frame.py::test_crc16_modbus_known_vector", "scope": "function"}
+{"duration_s": 0.002421, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_protocol_frame.py::test_crc16_modbus_known_vector", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_protocol_frame.py::test_frame_round_trip", "scope": "function"}
+{"duration_s": 0.003138, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_protocol_frame.py::test_frame_round_trip", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_protocol_frame.py::test_frame_rejects_corrupted_crc", "scope": "function"}
+{"duration_s": 0.002411, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_protocol_frame.py::test_frame_rejects_corrupted_crc", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_quality_gate.py::test_release_gate_passes_for_stable_build", "scope": "function"}
+{"duration_s": 0.002418, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_quality_gate.py::test_release_gate_passes_for_stable_build", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_quality_gate.py::test_release_gate_blocks_flaky_or_critical_build", "scope": "function"}
+{"duration_s": 0.00286, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_quality_gate.py::test_release_gate_blocks_flaky_or_critical_build", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_quality_gate.py::test_release_gate_blocks_memory_release_blockers", "scope": "function"}
+{"duration_s": 0.003059, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_quality_gate.py::test_release_gate_blocks_memory_release_blockers", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_regression_field_log.py::test_field_logs_are_mapped_to_regression_families", "scope": "function"}
+{"duration_s": 0.003367, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_regression_field_log.py::test_field_logs_are_mapped_to_regression_families", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_validation_runner.py::test_validation_runner_generates_release_evidence", "scope": "function"}
+{"duration_s": 0.028571, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_validation_runner.py::test_validation_runner_generates_release_evidence", "scope": "function"}
+{"event": "setup", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_validation_runner.py::test_validation_runner_keeps_v2h_safety_as_critical_check", "scope": "function"}
+{"duration_s": 0.019264, "event": "teardown", "fixture": "record_fixture_lifecycle", "nodeid": "tests/test_validation_runner.py::test_validation_runner_keeps_v2h_safety_as_critical_check", "scope": "function"}

@@ -1,0 +1,51 @@
+{
+  "release_blockers": [],
+  "reports": [
+    {
+      "details": {
+        "actual_crc": "0x91AF",
+        "expected_crc": "0x91AF",
+        "region": "configuration_nvm",
+        "schema_version": 3
+      },
+      "duration_ms": 12.2,
+      "severity": "release_blocker",
+      "status": "PASS",
+      "test_name": "nvm_crc_integrity"
+    },
+    {
+      "details": {
+        "actual_schema_version": 3,
+        "expected_schema_version": 3,
+        "migration_required": false
+      },
+      "duration_ms": 9.4,
+      "severity": "release_blocker",
+      "status": "PASS",
+      "test_name": "nvm_schema_validate"
+    },
+    {
+      "details": {
+        "attempted_write_blocked": true,
+        "factory_region_locked": true,
+        "region": "factory_identity_and_calibration"
+      },
+      "duration_ms": 5.1,
+      "severity": "release_blocker",
+      "status": "PASS",
+      "test_name": "nvm_factory_region_locked"
+    },
+    {
+      "details": {
+        "endurance_policy": "nightly/endurance-only, not PR smoke",
+        "erase_write_cycles": 128,
+        "warning_threshold": 80000
+      },
+      "duration_ms": 4.0,
+      "severity": "warning",
+      "status": "PASS",
+      "test_name": "nvm_wear_level_stats"
+    }
+  ],
+  "target": "sim"
+}
